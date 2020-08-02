@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="/vue.css">
+</head>
+
+<body>
+  <div id="app">
+    <div class='head'>
+      <div class="header">
+        <div class="logo">{{message}}</div>
+        <input type="text" placeholder="添加ToDo" v-on:keyup.enter="add" v-model='todo'>
+      </div>
+
+    </div>
+    <div class="main">
+      <div class="doing">
+        <h3><span>正在进行</span><span class='num'>{{doingNum}}</span></h3>
+        <div class="list" v-if='item.done===false' v-for='(item,index) in doingList'>
+          <input type="checkbox" name="" id="" @change='changeDone(index)'>
+          <div class="content" >{{item.content}}</div>
+
+          <button class='exp' @click='inExplain(item)' >详情</button>
+        </div>
+      </div>
+      <div class="explain">
+       
+        <div v-for='(item,index) in doingList' v-if='item.showExplain'>
+          <h3>{{item.content}}</h3>
+          
+          <span>{{item.time}}</span>
+          <!-- <button  @click='changeExplain(item)'>说明</button> -->
+          <textarea placeholder	='事件' name="a"  v-model='item.explain'>这里写内容</textarea>
+        </div>
+      </div>
+      
+      
+
+    </div>
+    <div class="doneList">
+      <h3><span>完成事件</span><span class='num'>{{doneNum}}</span></h3>
+      <div class="list" v-for='(item,index) in doingList' v-if='item.done===true'>
+        <input type="checkbox" name="" id="" checked='checked' @change='changeDone(index)'>
+        <div class="content"><span>{{item.content}}</span></div>
+        <div class="time"><span> {{item.time}}</span></div>
+
+        <button class='restore' @click='changeDone(index)'>还原</button>
+        <button class='dev'@click='del(index)'>删除</button>
+      </div>
+    </div>
+    <div class="delList">
+
+    </div>
+  </div>
+  <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+  <script>
+    const app = new Vue({
+      el: '#app',
+      data: {
+        message: 'ToDoList',
+        todo: '',
+        time: '',
+        explain: '',
+        doingList: [
+          // { content: '吃饭', done: false },
+          // { content: '睡觉', done: false },
+          // { content: '游戏', done: false },
+          // { content: '工作', done: false },
+          // { content: '上班', done: false },
+        ],
+
+        // doneList: []
+      },
+      methods: {
+        add() {
+      
+          let todoObj = {}
+          this.doingList.push({ content: this.todo, done: false, time: new Date().toLocaleTimeString(), explain: "", showExplain: false })
+
+          this.todo = ''
+          this.saveData()
+        },
+
+        del(index) {
+          this.doingList.splice(index, 1)
+          this.saveData()
+        },
+
+        changeDone(index) {
+          this.doingList[index].done = !this.doingList[index].done
+          this.saveData()
+        },
+        inExplain(item) {
+          this.doingList.forEach(i => {
+            i.showExplain = false
+          });
+          item.showExplain = true
+        },
+      
+        saveData() {
+          localStorage.doingList = JSON.stringify(this.doingList)
+        }
+      },
+      computed: {
+        doingNum() {
+
+          return this.doingList.filter(item => !item.done).length
+        },
+        doneNum() {
+          return this.doingList.length - this.doingNum
+        }
+      },
+      mounted: function () {
+        this.doingList = JSON.parse(localStorage.doingList)
+      }
+
+
+    })
+
+  </script>
+</body>
+
+</html>
